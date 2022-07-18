@@ -7,7 +7,7 @@ const app = express()
 const server = http.createServer(app)
 const io = socketio(server)
 const {generateMessage, generateLocationMessage} = require('./utils/messages')
-const {addUser, removeUser, getUser, getUserInRoom} = require('./utils/users')
+const {addUser, removeUser, getUser, getUserInRoom, getInfo} = require('./utils/users')
 
 const port = process.env.PORT || 3000
 const publicDirectory = path.join(__dirname, '../public')
@@ -17,7 +17,8 @@ app.use(express.static(publicDirectory))
 let mess = 'Welcome'
 io.on('connection', (socket) => {
     console.log('New Websocket connection !')
-
+    // console.log(getInfo())
+    socket.emit('info',getInfo())
     socket.on('join', ({username, room}, callback) => {
         const {error, user} = addUser({id: socket.id, username, room})
         if (error) {
@@ -42,6 +43,7 @@ io.on('connection', (socket) => {
         }
         io.to(user.room).emit('message', generateMessage(user.username,message))
         callback()
+
     })
     socket.on('disconnect', () => {
         const user = removeUser(socket.id)

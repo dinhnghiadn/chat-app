@@ -1,4 +1,4 @@
-    /* General Styles */
+/* General Styles */
 
 * {
     margin: 0;
@@ -61,7 +61,7 @@ button:disabled {
 .centered-form {
     background: #333744;
     width: 100vw;
-    height: 100vh;   
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -115,7 +115,7 @@ button:disabled {
 /* Message Styles */
 
 .message {
-    margin-bottom: 16px;   
+    margin-bottom: 16px;
 }
 
 .message__name {
@@ -166,7 +166,7 @@ button:disabled {
     font-weight: 400;
     font-size: 22px;
     background: #2c2f3a;
-    padding: 24px;   
+    padding: 24px;
 }
 
 .list-title {
@@ -180,4 +180,29 @@ button:disabled {
     list-style-type: none;
     font-weight: 300;
     padding: 12px 24px 0 24px;
+}
+
+.index__sidebar {
+    height: 100%;
+    width: 200px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #f3d702;
+    padding-top: 20px;
+}
+.info{
+    justify-content: center;
+    align-items: center;
+    padding-left: 20px;
+}
+.tittle{
+    font-size: 20px;
+    font-weight: bold;
+    font-family: Calibri;
+}
+.content{
+    font-size: 16px;
+    font-family: Calibri;
 }
