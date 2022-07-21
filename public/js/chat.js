@@ -6,7 +6,8 @@ const $messageFormInput = $messageForm.querySelector('input')
 const $messageFormButton = $messageForm.querySelector('button')
 const $sendLocationButton = document.querySelector('#send-location')
 const $messages = document.querySelector(('#messages'))
-
+const $logOutButton = document.querySelector('#log-out')
+const sidebarIndexTemplate = document.querySelector('#sidebar-index').innerHTML
 //Templates
 const messageTemplate = document.querySelector('#message-template').innerHTML
 const locationMessageTemplate = document.querySelector('#location-message-template').innerHTML
@@ -51,6 +52,15 @@ socket.on('roomData', ({room, users}) => {
     document.querySelector('#sidebar').innerHTML = html
 })
 
+socket.on('joinInfo',(info)=>{
+    console.log(info)
+
+    const html = Mustache.render(sidebarIndexTemplate, {
+        rooms: info
+    })
+    document.querySelector('#sidebar2').innerHTML = html
+})
+
 
 $messageForm.addEventListener('submit', (e) => {
     e.preventDefault()
@@ -68,6 +78,10 @@ $messageForm.addEventListener('submit', (e) => {
         console.log('Message delivered!')
     })
 })
+$logOutButton.addEventListener('click',()=>{
+    location.href = '/'
+})
+
 
 $sendLocationButton.addEventListener('click', () => {
     if (!navigator.geolocation) {
@@ -92,3 +106,10 @@ socket.emit('join', {username, room}, (error) => {
         location.href = '/'
     }
 })
+function changeRoom(room)  {
+    const searchParams = new URLSearchParams(window.location.search)
+    const currentUser = searchParams.get('username').toString()
+    console.log(currentUser)
+    location.href = '/chat.html?username=' +currentUser +'&room='+room
+}
+
