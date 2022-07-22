@@ -14,7 +14,7 @@ const locationMessageTemplate = document.querySelector('#location-message-templa
 const sidebarTemplate = document.querySelector('#sidebar-template').innerHTML
 // const sidebarIndexTemplate = document.querySelector('#sidebar-index').innerHTML
 //Options
-const {username, room} = Qs.parse(location.search, {ignoreQueryPrefix: true})
+const {room} = Qs.parse(location.search, {ignoreQueryPrefix: true})
 
 const autoscroll = () => {
     $messages.scrollTop = $messages.scrollHeight
@@ -60,6 +60,10 @@ socket.on('joinInfo',(info)=>{
     })
     document.querySelector('#sidebar2').innerHTML = html
 })
+socket.on('redirect',()=>{
+    alert('Invalid username. Redirect to homepage...')
+    location.href = '/'
+})
 
 
 $messageForm.addEventListener('submit', (e) => {
@@ -100,16 +104,17 @@ $sendLocationButton.addEventListener('click', () => {
     })
 })
 
-socket.emit('join', {username, room}, (error) => {
+socket.emit('join', {room}, (error) => {
+
     if (error) {
         alert(error)
         location.href = '/'
     }
 })
 function changeRoom(room)  {
-    const searchParams = new URLSearchParams(window.location.search)
-    const currentUser = searchParams.get('username').toString()
-    console.log(currentUser)
-    location.href = '/chat.html?username=' +currentUser +'&room='+room
+    // const searchParams = new URLSearchParams(window.location.search)
+    // const currentUser = searchParams.get('username').toString()
+    // console.log(currentUser)
+    location.href = '/chat.html?room='+room
 }
 
