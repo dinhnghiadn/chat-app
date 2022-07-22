@@ -19,6 +19,5 @@
     "express-session": "^1.17.3"
   },
   "devDependencies": {
-    "express-session": "^1.17.3"
   }
 }
