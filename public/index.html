@@ -10,15 +10,21 @@
 
 <div class="centered-form">
     <div class="centered-form__box">
-        <h1>Join us</h1>
+        <div class="title-text"><h1>Login</h1></div>
         <form action="/chat.html" method="post">
-            <label>Display name</label>
+            <label>Username</label>
             <input type="text" name="username" placeholder="Display name"
+                   required>
+            <label>Password</label>
+            <input type="password" name="password" placeholder="Display name"
                    required>
             <label>Room name</label>
             <input type="text" name="room" placeholder="Room name" required>
             <button>Join</button>
         </form>
+        <div class="title-text"><h2>OR</h2></div>
+        <div><a
+                href="signup.html"><button class="signup">Sign up</button></a></div>
     </div>
     <div id="sidebar2" class="index__sidebar"></div>
 </div>
@@ -28,11 +34,11 @@
     <ul class="info">
         {{#rooms}}
         <li class="tittle">{{room}} - (users: {{users.length}})</li>
-        <ul>
-            {{#users}}
-            <li class="content">{{username}}</li>
-            {{/users}}
-        </ul>
+<!--        <ul>-->
+<!--            {{#users}}-->
+<!--            <li class="content">{{username}}</li>-->
+<!--            {{/users}}-->
+<!--        </ul>-->
         {{/rooms}}
     </ul>
 </script>

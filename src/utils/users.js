@@ -1,10 +1,8 @@
-const users = []
-
-// addUser, removeUser, getUser, getUsersInRoom
-
-const addUser = ({id, username, room}) => {
-    //Clean the data
-    username = username.trim().toLowerCase()
+const jwt = require('jsonwebtoken')
+const {userRepository, socketRepository} = require('../utils/db')
+const {Socket} = require('../models/Socket')
+const addUser = async ({id, username, room}) => {
+    //Clean room name
     room = room.trim().toLowerCase()
 
     //Validate the data
@@ -13,56 +11,63 @@ const addUser = ({id, username, room}) => {
             error: 'Username and room are required!'
         }
     }
-    //Check for existing user
-    const existingUser = users.find((user) => {
-        return user.room === room && user.username === username
-    })
 
-    //Validate username
-    if (existingUser) {
-        return {
-            error: 'Username is in use!'
-        }
-    }
     //Store user
-    const user = {id, username, room}
-    users.push(user)
-    return {user}
+    const user = await userRepository.findOneOrFail({
+        where: {username},
+        relations: {sockets: true}
+    },)
+    user.sockets.push({
+        'socketID': id,
+        'roomName': room
+    })
+    await userRepository.save(user)
+    return user
 }
-const removeUser = (id) => {
-    const index = users.findIndex((user) => user.id === id)
-    if (index !== -1) {
-        return users.splice(index, 1)[0]
-    }
+const removeUser = async (id) => {
+
+    const user = await userRepository.createQueryBuilder('user').leftJoinAndSelect('user.sockets', 'socket').where('socketID =:id', {id}).getOne()
+    await socketRepository.createQueryBuilder().delete().where('socketID =:id', {id}).execute()
+    return user
+
 }
 
-const getUser = (id) => {
-    return users.find((user) => user.id === id)
+const getUserAndRoom = async (id) => {
+    return userRepository.createQueryBuilder('user').leftJoinAndSelect('user.sockets', 'socket').where('socketID =:id', {id}).getOne()
+
 }
 
 const getUserInRoom = (room) => {
     room = room.trim().toLowerCase()
-    return users.filter((user) => user.room === room)
+    return userRepository.createQueryBuilder('user').leftJoinAndSelect('user.sockets', 'socket').where('roomName =:room', {room}).getMany()
 }
 
-const getInfo = () => {
-    const groupedTech = users.reduce((acc, user) => {
+const getInfo = async () => {
+    const results = await socketRepository.createQueryBuilder('socket').leftJoinAndSelect('socket.user', 'user').getMany()
+    const groupRoom = results.reduce((acc, result) => {
         // Group initialization
-        if (!acc[user.room]) {
-            acc[user.room] = []
+        if (!acc[result.roomName]) {
+            acc[result.roomName] = []
         }
         // Grouping
-        acc[user.room].push(user)
+        acc[result.roomName].push(result.user)
         return acc
     }, {})
-    return Object.entries(groupedTech).map(([room, users]) => ({
+    return Object.entries(groupRoom).map(([room, users]) => ({
         room,
         users
     }))
+}
 
-    // return users
+const generateAuthToken = (user) => {
+    return jwt.sign({_id: user.id}, process.env.JWT_SECRET)
 }
 
 module.exports = {
-    addUser, removeUser, getUser, getUserInRoom, getInfo
+    addUser,
+    removeUser,
+    getUserAndRoom,
+    getUserInRoom,
+    getInfo,
+    generateAuthToken
 }
