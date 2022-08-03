@@ -1,20 +1,23 @@
-const path = require('path')
-const http = require('http')
-const express = require('express')
-const {sessionMiddleware, wrap, auth} = require('./utils/middleware')
+import path from "path"
+import http from "http"
+import express from "express"
+import {sessionMiddleware} from "./utils/middleware"
+
 const app = express()
 const server = http.createServer(app)
-const bodyParser = require("body-parser")
-const socketio = require('socket.io')
+import bodyParser from "body-parser"
+
+import socketio from "socket.io"
+// @ts-ignore
 const io = socketio(server)
-require('dotenv/config')
-require('./utils/db')
-require('./router/socket')(io)
-const userRouter = require('./router/user')(io)
+import "dotenv/config"
+import "./utils/db"
+import {socketRouter} from "./router/socket";
+import {userRouter} from "./router/user";
 
 const port = process.env.PORT || 3000
 const publicDirectory = path.join(__dirname, '../public')
-
+socketRouter(io)
 
 app.use(express.static(publicDirectory))
 app.use(bodyParser.urlencoded({
@@ -22,7 +25,7 @@ app.use(bodyParser.urlencoded({
 }))
 app.use(sessionMiddleware)
 app.use(bodyParser.json())
-app.use(userRouter)
+app.use(userRouter(io))
 
 app.use((req, res) => {
     res.status(404).render('error');

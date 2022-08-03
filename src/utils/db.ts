@@ -1,7 +1,7 @@
-require('dotenv/config')
-const {DataSource} = require('typeorm')
-const User = require('../models/User')
-const Socket = require('../models/Socket')
+import 'dotenv/config'
+import {DataSource} from 'typeorm'
+import {User} from '../models/User'
+import {Socket} from '../models/Socket'
 
 
 const dataSource = new DataSource({
@@ -11,7 +11,7 @@ const dataSource = new DataSource({
     username: process.env.MYSQL_USERNAME,
     password: process.env.MYSQL_PASSWORD,
     database: process.env.MYSQL_DATABASE,
-    entities: ['./src/models/*.js'],
+    entities: ['./src/models/*.ts'],
     synchronize: true
 })
 
@@ -22,6 +22,6 @@ dataSource.initialize()
     .catch((err) => {
         console.error("Error during Data Source initialization", err)
     })
-const userRepository = dataSource.getRepository(User)
-const socketRepository = dataSource.getRepository(Socket)
-module.exports = {userRepository, socketRepository}
+export const userRepository = dataSource.getRepository(User)
+export const socketRepository = dataSource.getRepository(Socket)
+

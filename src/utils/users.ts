@@ -1,73 +1,64 @@
-const jwt = require('jsonwebtoken')
-const {userRepository, socketRepository} = require('../utils/db')
-const {Socket} = require('../models/Socket')
-const addUser = async ({id, username, room}) => {
+import jwt from 'jsonwebtoken'
+import {userRepository, socketRepository} from "./db"
+import {User} from "../models/User";
+
+export const addUser = async (id:string, username:string, room:string) => {
     //Clean room name
     room = room.trim().toLowerCase()
-
     //Validate the data
     if (!username || !room) {
         return {
             error: 'Username and room are required!'
         }
     }
-
     //Store user
     const user = await userRepository.findOneOrFail({
         where: {username},
         relations: {sockets: true}
     },)
-    user.sockets.push({
-        'socketID': id,
-        'roomName': room
-    })
+    const newSocket = socketRepository.create({socketID:id, roomName:room})
+    user.sockets.push(newSocket)
     await userRepository.save(user)
     return user
 }
-const removeUser = async (id) => {
-
+export const removeUser = async (id: string) => {
     const user = await userRepository.createQueryBuilder('user').leftJoinAndSelect('user.sockets', 'socket').where('socketID =:id', {id}).getOne()
     await socketRepository.createQueryBuilder().delete().where('socketID =:id', {id}).execute()
     return user
 
 }
 
-const getUserAndRoom = async (id) => {
+export const getUserAndRoom = async (id: string) => {
     return userRepository.createQueryBuilder('user').leftJoinAndSelect('user.sockets', 'socket').where('socketID =:id', {id}).getOne()
 
 }
 
-const getUserInRoom = (room) => {
+export const getUserInRoom = (room: string) => {
     room = room.trim().toLowerCase()
     return userRepository.createQueryBuilder('user').leftJoinAndSelect('user.sockets', 'socket').where('roomName =:room', {room}).getMany()
 }
 
-const getInfo = async () => {
-    const results = await socketRepository.createQueryBuilder('socket').leftJoinAndSelect('socket.user', 'user').getMany()
+
+export const getInfo = async () => {
+    const results = await socketRepository.createQueryBuilder('socket').leftJoinAndSelect('socket.user', 'user').select(['socket.roomName',
+    'user.username']).getRawMany()
+
     const groupRoom = results.reduce((acc, result) => {
         // Group initialization
-        if (!acc[result.roomName]) {
-            acc[result.roomName] = []
+        if (!acc[result.socket_roomName]) {
+            acc[result.socket_roomName] = []
         }
         // Grouping
-        acc[result.roomName].push(result.user)
+        acc[result.socket_roomName].push(result.user_username)
         return acc
     }, {})
+
     return Object.entries(groupRoom).map(([room, users]) => ({
         room,
         users
     }))
 }
 
-const generateAuthToken = (user) => {
-    return jwt.sign({_id: user.id}, process.env.JWT_SECRET)
-}
-
-module.exports = {
-    addUser,
-    removeUser,
-    getUserAndRoom,
-    getUserInRoom,
-    getInfo,
-    generateAuthToken
+export const generateAuthToken = (user: User) => {
+    return jwt.sign({_id: user.id}, process.env.JWT_SECRET as string)
 }
