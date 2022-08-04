@@ -12,9 +12,9 @@ const sidebarIndexTemplate = document.querySelector('#sidebar-index').innerHTML
 const messageTemplate = document.querySelector('#message-template').innerHTML
 const locationMessageTemplate = document.querySelector('#location-message-template').innerHTML
 const sidebarTemplate = document.querySelector('#sidebar-template').innerHTML
-// const sidebarIndexTemplate = document.querySelector('#sidebar-index').innerHTML
-//Options
-const {room} = Qs.parse(location.search, {ignoreQueryPrefix: true})
+
+const roomObject = Qs.parse(location.search, {ignoreQueryPrefix: true})
+const room = roomObject.room
 
 const autoscroll = () => {
     $messages.scrollTop = $messages.scrollHeight
@@ -60,8 +60,8 @@ socket.on('joinInfo',(info)=>{
     })
     document.querySelector('#sidebar2').innerHTML = html
 })
-socket.on('redirect',()=>{
-    alert('Invalid username. Redirect to homepage...')
+socket.on('redirect',(message)=>{
+    alert(`${message}. Redirect to homepage...`)
     location.href = '/'
 })
 
@@ -104,8 +104,7 @@ $sendLocationButton.addEventListener('click', () => {
     })
 })
 
-socket.emit('join', {room}, (error) => {
-
+socket.emit('join', room, (error) => {
     if (error) {
         alert(error)
         location.href = '/'

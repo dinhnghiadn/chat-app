@@ -8,16 +8,16 @@ import {
 } from '../utils/users'
 import {generateMessage, generateLocationMessage} from '../utils/messages'
 import Filter from 'bad-words'
-import {User} from "../models/User";
+import {User} from "../models/User"
 
 export function socketRouter(io: any) {
     io.use(wrap(sessionMiddleware));
     io.on('connection', async (socket: any) => {
         console.log('New Websocket connection !')
         socket.emit('info', await getInfo())
-        socket.on('join', async ({room}: any, callback: () => void) => {
+        socket.on('join', async (room: string, callback: () => void) => {
             if (!socket.request.session.user) {
-                return socket.emit('redirect')
+                return socket.emit('redirect','Invalid username')
             }
             const usernameInput = socket.request.session.user
             let user = await addUser(
@@ -25,11 +25,12 @@ export function socketRouter(io: any) {
                 usernameInput,
                 room
             )
+            if (!(user instanceof User)){
+                return socket.emit('redirect',user.error)
+            }
             socket.join(room)
             socket.emit('message', generateMessage('Admin', 'Welcome!'))
-            if (user instanceof User) {
-                socket.broadcast.to(room).emit('message', generateMessage('Admin', `${user.username} has joined!`) as any)
-            }
+            socket.broadcast.to(room).emit('message', generateMessage('Admin', `${user.username} has joined!`) as any)
             io.to(room).emit('joinInfo', await getInfo())
             io.to(room).emit('roomData', {
                 room: room,

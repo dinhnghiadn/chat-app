@@ -4,34 +4,41 @@ import express from "express"
 import {sessionMiddleware} from "./utils/middleware"
 
 const app = express()
-const server = http.createServer(app)
-import bodyParser from "body-parser"
-
-import socketio from "socket.io"
-// @ts-ignore
-const io = socketio(server)
+const httpServer = http.createServer(app)
+import { Server } from "socket.io"
+const io = new Server(httpServer)
 import "dotenv/config"
-import "./utils/db"
-import {socketRouter} from "./router/socket";
-import {userRouter} from "./router/user";
+import {socketRouter} from "./router/socket"
+import {userRouter} from "./router/user"
+import {DatabaseConnection} from "./utils/db"
+
 
 const port = process.env.PORT || 3000
 const publicDirectory = path.join(__dirname, '../public')
 socketRouter(io)
 
 app.use(express.static(publicDirectory))
-app.use(bodyParser.urlencoded({
+
+// Middleware for parsing bodies from URL to request
+app.use(express.urlencoded({
     extended: false
 }))
+
+// Middleware for parsing json objects to request
+app.use(express.json())
+
 app.use(sessionMiddleware)
-app.use(bodyParser.json())
+
 app.use(userRouter(io))
 
 app.use((req, res) => {
     res.status(404).render('error');
 });
-server.listen(port, () => {
-    console.log(`Server is up on ${port}! `)
-})
+
+export const startConnection = new DatabaseConnection(httpServer,port as string)
+
+// httpServer.listen(port, () => {
+//     console.log(`Server is up on ${port}! `)
+// })
 
 

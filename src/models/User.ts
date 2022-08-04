@@ -5,10 +5,10 @@ import {
     Entity, OneToMany,
     PrimaryGeneratedColumn
 } from "typeorm"
-import {Socket} from "./Socket";
-import {MaxLength, MinLength} from "class-validator";
+import {Socket} from "./Socket"
+import {MaxLength, MinLength} from "class-validator"
 import bcrypt from "bcryptjs"
-import {classToPlain, Exclude, instanceToPlain} from "class-transformer";
+import { Exclude, instanceToPlain} from "class-transformer"
 
 
 @Entity('users')
@@ -48,7 +48,7 @@ export class User extends BaseEntity {
             try {
                 this.password = await bcrypt.hash(this.password, 8)
             } catch (e) {
-                throw new Error('There are some issue in the hash!')
+                throw new Error('There are some issues in the hash!')
             }
         }
     }
