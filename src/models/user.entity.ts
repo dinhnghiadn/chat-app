@@ -5,7 +5,7 @@ import {
     Entity, OneToMany,
     PrimaryGeneratedColumn
 } from "typeorm"
-import {Socket} from "./Socket"
+import {Socket} from "./socket.entity"
 import {MaxLength, MinLength} from "class-validator"
 import bcrypt from "bcryptjs"
 import { Exclude, instanceToPlain} from "class-transformer"

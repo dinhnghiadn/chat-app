@@ -1,4 +1,4 @@
-import {sessionMiddleware, wrap} from '../utils/middleware'
+import {sessionMiddleware, wrap} from '../utils/session'
 import {
     addUser,
     removeUser,
@@ -8,16 +8,18 @@ import {
 } from '../utils/users'
 import {generateMessage, generateLocationMessage} from '../utils/messages'
 import Filter from 'bad-words'
-import {User} from "../models/User"
+import {User} from "../models/user.entity"
 
 export function socketRouter(io: any) {
     io.use(wrap(sessionMiddleware));
     io.on('connection', async (socket: any) => {
         console.log('New Websocket connection !')
         socket.emit('info', await getInfo())
+
+        //Listen on join event
         socket.on('join', async (room: string, callback: () => void) => {
             if (!socket.request.session.user) {
-                return socket.emit('redirect','Invalid username')
+                return socket.emit('redirect', 'Invalid username')
             }
             const usernameInput = socket.request.session.user
             let user = await addUser(
@@ -25,8 +27,8 @@ export function socketRouter(io: any) {
                 usernameInput,
                 room
             )
-            if (!(user instanceof User)){
-                return socket.emit('redirect',user.error)
+            if (!(user instanceof User)) {
+                return socket.emit('redirect', user.error)
             }
             socket.join(room)
             socket.emit('message', generateMessage('Admin', 'Welcome!'))
@@ -39,6 +41,7 @@ export function socketRouter(io: any) {
             callback()
         })
 
+        //Listen on sendMessage event
         socket.on('sendMessage', async (message: string, callback: any) => {
             const user = await getUserAndRoom(socket.id)
             const filter = new Filter()
@@ -49,11 +52,15 @@ export function socketRouter(io: any) {
             callback()
 
         })
+
+        //Listen on sendLocation event
         socket.on('sendLocation', async (coords: { latitude: string, longitude: string }, callback: () => void) => {
             const user = await getUserAndRoom(socket.id)
             io.to(user!.sockets[0].roomName).emit('locationMessage', generateLocationMessage(user!.username, `https://google.com/maps?q=${coords.latitude},${coords.longitude}`) as any)
             callback()
         })
+
+        //Listen on disconnect event
         socket.on('disconnect', async () => {
             const user = await removeUser(socket.id)
             if (user) {

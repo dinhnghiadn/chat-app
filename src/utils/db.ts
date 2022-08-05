@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import {DataSource} from 'typeorm'
-import {User} from '../models/User'
-import {Socket} from '../models/Socket'
+import {User} from '../models/user.entity'
+import {Socket} from '../models/socket.entity'
 import { Server } from 'http'
 
 export class DatabaseConnection {
@@ -12,7 +12,7 @@ export class DatabaseConnection {
         username: process.env.MYSQL_USERNAME,
         password: process.env.MYSQL_PASSWORD,
         database: process.env.MYSQL_DATABASE,
-        entities: ['./src/models/*.ts'],
+        entities: ['./src/models/*.entity.ts'],
         synchronize: true
     })
     userRepository = this.dataSource.getRepository(User)

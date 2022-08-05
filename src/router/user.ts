@@ -1,11 +1,10 @@
 import express, {NextFunction, Request, Response} from "express"
+import {generateAuthToken,auth} from "../utils/auth"
+import {validate} from "class-validator"
+import * as bcrypt from "bcryptjs"
+import {startConnection} from "../index"
 
 const router = express.Router()
-import {generateAuthToken} from "../utils/users"
-import {auth} from "../utils/middleware"
-import {validate} from "class-validator"
-import bcrypt from "bcryptjs"
-import {startConnection} from "../index"
 
 export function userRouter(io: any) {
     // Sign up user
@@ -41,7 +40,6 @@ export function userRouter(io: any) {
                     username: req.body.username
                 }
             })
-            console.log(user)
             if (user !== null) {
                 const isMatch = await bcrypt.compare(req.body.password, user.password)
                 if (isMatch) {
@@ -134,7 +132,6 @@ export function userRouter(io: any) {
             }
         })
         if (user!==null) {
-
             const isMatch = await bcrypt.compare(req.body.password, user.password)
             if (isMatch) {
                 const username = req.body.username;
@@ -143,7 +140,6 @@ export function userRouter(io: any) {
                 req.session.user = username;
                 res.redirect('/chat.html?room=' + room)
             } else res.status(400).send({error: 'Password not match!'})
-
         } else {
             res.status(404).send({error: 'Invalid username!'})
         }

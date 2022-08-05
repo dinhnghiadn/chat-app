@@ -1,17 +1,16 @@
 import path from "path"
 import http from "http"
 import express from "express"
-import {sessionMiddleware} from "./utils/middleware"
-
-const app = express()
-const httpServer = http.createServer(app)
-import { Server } from "socket.io"
-const io = new Server(httpServer)
+import {sessionMiddleware} from "./utils/session"
 import "dotenv/config"
 import {socketRouter} from "./router/socket"
 import {userRouter} from "./router/user"
 import {DatabaseConnection} from "./utils/db"
+import { Server } from "socket.io"
 
+const app = express()
+const httpServer = http.createServer(app)
+const io = new Server(httpServer)
 
 const port = process.env.PORT || 3000
 const publicDirectory = path.join(__dirname, '../public')
@@ -37,8 +36,5 @@ app.use((req, res) => {
 
 export const startConnection = new DatabaseConnection(httpServer,port as string)
 
-// httpServer.listen(port, () => {
-//     console.log(`Server is up on ${port}! `)
-// })
 
 

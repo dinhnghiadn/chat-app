@@ -1,6 +1,5 @@
-import jwt from 'jsonwebtoken'
+
 import {startConnection} from "../index"
-import {User} from "../models/User"
 import {validate} from "class-validator"
 
 export const addUser = async (id:string, username:string, room:string) => {
@@ -53,8 +52,4 @@ export const getInfo = async () => {
         room,
         users
     }))
-}
-
-export const generateAuthToken = (user: User) => {
-    return jwt.sign({_id: user.id}, process.env.JWT_SECRET as string)
 }

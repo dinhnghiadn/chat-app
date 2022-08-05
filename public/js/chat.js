@@ -1,5 +1,4 @@
 const socket = io()
-
 //Elements
 const $messageForm = document.querySelector('#message-form')
 const $messageFormInput = $messageForm.querySelector('input')
@@ -13,12 +12,16 @@ const messageTemplate = document.querySelector('#message-template').innerHTML
 const locationMessageTemplate = document.querySelector('#location-message-template').innerHTML
 const sidebarTemplate = document.querySelector('#sidebar-template').innerHTML
 
-const roomObject = Qs.parse(location.search, {ignoreQueryPrefix: true})
-const room = roomObject.room
+// const roomObject = Qs.parse(location.search, {ignoreQueryPrefix: true})
+// const room = roomObject.room
+const searchParams = new URLSearchParams(window.location.search)
+const room = searchParams.get('room').toString()
 
 const autoscroll = () => {
     $messages.scrollTop = $messages.scrollHeight
 }
+
+// Sockets event listener
 
 socket.on('message', (message) => {
     console.log(message)
@@ -65,7 +68,7 @@ socket.on('redirect',(message)=>{
     location.href = '/'
 })
 
-
+// Event listeners
 $messageForm.addEventListener('submit', (e) => {
     e.preventDefault()
     $messageFormButton.setAttribute('disabled', 'disabled')
@@ -104,16 +107,17 @@ $sendLocationButton.addEventListener('click', () => {
     })
 })
 
+
+// Emit join event
 socket.emit('join', room, (error) => {
     if (error) {
         alert(error)
         location.href = '/'
     }
 })
+
+// Change room function
 function changeRoom(room)  {
-    // const searchParams = new URLSearchParams(window.location.search)
-    // const currentUser = searchParams.get('username').toString()
-    // console.log(currentUser)
     location.href = '/chat.html?room='+room
 }
 
