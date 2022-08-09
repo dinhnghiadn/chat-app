@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Real time chat applicaton</title>
+    <link rel="icon" href="../img/favicon.png">
+    <link rel="stylesheet" href="../css/styles.min.css">
+</head>
+<body>
+
+<div class="centered-form">
+    <div class="centered-form__box">
+        <h3 class="title">Room list</h3>
+        <% info.forEach((item) => { %>
+        <li><a href="javascript:void(0)"
+               onclick="changeRoom(<%= item.room %>);return
+                              false"><%= item.room %> - users: <%= item
+                        .users.length %></a></li>
+        <% }) %>
+
+        <div>
+            <form action="/chat" method="get">
+                <input id="room" name="room" placeholder="Room name" required>
+                <button id='button' type="submit">Create room</button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="../js/room.js"></script>
+<script>
+    const info = <%- JSON.stringify(info) %>
+    console.log(info)
+    const createRoom = document.getElementById('room')
+    const btn = document.getElementById('button')
+    createRoom.addEventListener('input', function(){
+        if (info.some(i => i.room === this.value)){
+            btn.disabled = true
+        } else btn.disabled = false
+    })
+</script>
+</body>
+</html>
+

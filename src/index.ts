@@ -14,7 +14,11 @@ const io = new Server(httpServer)
 
 const port = process.env.PORT || 3000
 const publicDirectory = path.join(__dirname, '../public')
+const viewsPath = path.join(__dirname, '../public/views')
 socketRouter(io)
+//
+app.set('views', viewsPath)
+app.set('view engine', 'ejs')
 
 app.use(express.static(publicDirectory))
 
@@ -31,10 +35,16 @@ app.use(sessionMiddleware)
 app.use(userRouter(io))
 
 app.use((req, res) => {
-    res.status(404).render('error');
-});
+    res.status(404).render('error')
+})
 
-export const startConnection = new DatabaseConnection(httpServer,port as string)
-
+export const startConnection = new DatabaseConnection()
+startConnection.initialize().then(()=>{
+    httpServer.listen(port, () => {
+        console.log(`Server is up on ${port}! `)
+    })
+}).catch((err) => {
+    console.error("Error during Data Source initialization", err)
+})
 
 

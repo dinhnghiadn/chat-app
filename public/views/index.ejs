@@ -3,28 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <title>Real time chat applicaton</title>
-    <link rel="icon" href="/img/favicon.png">
-    <link rel="stylesheet" href="/css/styles.min.css">
+    <link rel="icon" href="../img/favicon.png">
+    <link rel="stylesheet" href="../css/styles.min.css">
 </head>
 <body>
 
 <div class="centered-form">
     <div class="centered-form__box">
         <div class="title-text"><h1>Login</h1></div>
-        <form action="/chat.html" method="post">
+        <form action="/room" method="post">
             <label>Username</label>
             <input type="text" name="username" placeholder="Display name"
+            <% if (locals.username) { %>
+                   value="<%= username %>"
+                    <% } %>
                    required>
             <label>Password</label>
             <input type="password" name="password" placeholder="Display name"
+            <% if (locals.password) { %>
+                   value="<%= password %>"
+                    <% } %>
                    required>
-            <label>Room name</label>
-            <input type="text" name="room" placeholder="Room name" required>
-            <button>Join</button>
+            <button>Login</button>
         </form>
         <div class="title-text"><h2>OR</h2></div>
-        <div><a
-                href="signup.html"><button class="signup">Sign up</button></a></div>
+        <div>
+            <button class="signup">Sign up</button>
+        </div>
     </div>
     <div id="sidebar2" class="index__sidebar"></div>
 </div>
@@ -34,16 +39,11 @@
     <ul class="info">
         {{#rooms}}
         <li class="tittle">{{room}} - (users: {{users.length}})</li>
-<!--        <ul>-->
-<!--            {{#users}}-->
-<!--            <li class="content">{{username}}</li>-->
-<!--            {{/users}}-->
-<!--        </ul>-->
         {{/rooms}}
     </ul>
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
-<script src="/js/index.js"></script>
+<script src="../js/index.js"></script>
 </body>
 </html>

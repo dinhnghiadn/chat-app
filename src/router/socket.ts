@@ -4,18 +4,18 @@ import {
     removeUser,
     getUserAndRoom,
     getUserInRoom,
-    getInfo
+    getInfo, getUserAndSocket
 } from '../utils/users'
 import {generateMessage, generateLocationMessage} from '../utils/messages'
 import Filter from 'bad-words'
-import {User} from "../models/user.entity"
+import {User} from "../models/User.entity"
+import {Socket} from "../models/Socket.entity";
 
 export function socketRouter(io: any) {
     io.use(wrap(sessionMiddleware));
     io.on('connection', async (socket: any) => {
         console.log('New Websocket connection !')
         socket.emit('info', await getInfo())
-
         //Listen on join event
         socket.on('join', async (room: string, callback: () => void) => {
             if (!socket.request.session.user) {
@@ -71,6 +71,15 @@ export function socketRouter(io: any) {
                     users: await getUserInRoom(user.sockets[0].roomName)
                 } as any)
             }
+        })
+
+        socket.on('clearSession',async () =>{
+            const user = await getUserAndSocket(socket.request.session.user)
+            socket.request.session.destroy()
+            socket.emit('redirect', 'Log out')
+            user.sockets.forEach((i : Socket)=>{
+                io.in(i.socketID).disconnectSockets()
+            })
         })
 
     })

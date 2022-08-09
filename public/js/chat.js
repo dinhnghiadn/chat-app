@@ -12,11 +12,8 @@ const messageTemplate = document.querySelector('#message-template').innerHTML
 const locationMessageTemplate = document.querySelector('#location-message-template').innerHTML
 const sidebarTemplate = document.querySelector('#sidebar-template').innerHTML
 
-// const roomObject = Qs.parse(location.search, {ignoreQueryPrefix: true})
-// const room = roomObject.room
 const searchParams = new URLSearchParams(window.location.search)
 const room = searchParams.get('room').toString()
-
 const autoscroll = () => {
     $messages.scrollTop = $messages.scrollHeight
 }
@@ -64,7 +61,7 @@ socket.on('joinInfo',(info)=>{
     document.querySelector('#sidebar2').innerHTML = html
 })
 socket.on('redirect',(message)=>{
-    alert(`${message}. Redirect to homepage...`)
+    alert(`${message}. Redirect to index...`)
     location.href = '/'
 })
 
@@ -75,7 +72,6 @@ $messageForm.addEventListener('submit', (e) => {
 
     const message = e.target.elements.message.value
     socket.emit('sendMessage', message, (error) => {
-
         $messageFormButton.removeAttribute('disabled')
         $messageFormInput.value = ''
         $messageFormInput.focus()
@@ -86,7 +82,7 @@ $messageForm.addEventListener('submit', (e) => {
     })
 })
 $logOutButton.addEventListener('click',()=>{
-    location.href = '/'
+    socket.emit('clearSession')
 })
 
 
@@ -118,6 +114,6 @@ socket.emit('join', room, (error) => {
 
 // Change room function
 function changeRoom(room)  {
-    location.href = '/chat.html?room='+room
+    location.href = '/chat?room='+room
 }
 

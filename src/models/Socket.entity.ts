@@ -5,7 +5,7 @@ import {
     ManyToOne,
     PrimaryGeneratedColumn
 } from "typeorm"
-import {User} from "./user.entity"
+import {User} from "./User.entity"
 import {MaxLength} from "class-validator"
 
 @Entity('sockets')
